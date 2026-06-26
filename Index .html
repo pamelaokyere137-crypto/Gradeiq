@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GradeIQ — Student GPA & CGPA Calculator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+```
+:root {
+  --bg:        #0d0d0d;
+  --surface:   #161616;
+  --card:      #1e1e1e;
+  --border:    #2a2a2a;
+  --gold:      #f0c040;
+  --gold-dim:  #a07c1a;
+  --green:     #3ecf6e;
+  --red:       #f25f5c;
+  --text:      #f0f0f0;
+  --muted:     #888;
+  --radius:    12px;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  padding: 0 0 60px;
+}
+
+header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.logo-mark {
+  width: 38px; height: 38px;
+  background: var(--gold);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700; font-size: 18px;
+  color: #0d0d0d;
+}
+.logo-text {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 22px; font-weight: 700;
+  color: var(--text);
+}
+.logo-text span { color: var(--gold); }
+
+.hero {
+  text-align: center;
+  padding: 52px 24px 36px;
+}
+.hero h1 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(26px, 5vw, 44px);
+  font-weight: 700;
+  line-height: 1.15;
+  margin-bottom: 12px;
+}
+.hero h1 em { font-style: normal; color: var(--gold); }
+.hero p {
+  color: var(--muted);
+  font-size: 15px;
+  max-width: 420px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* REFERENCE TABLE */
+.ref-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+.ref-title {
+  font-size: 12px;
+  color: var(--gold);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-bottom: 12px;
+}
+.ref-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.ref-item {
+  background: var(--card);
+  border-radius: 8px;
+  padding: 8px 6px;
+  text-align: center;
+}
+.ref-grade {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--gold);
+}
+.ref-point {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.container {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 20px;
+}
+.card-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 18px;
+}
+
+label {
+  display: block;
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 6px;
+  margin-top: 14px;
+}
+input, select {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 15px;
+  font-family: 'Inter', sans-serif;
+  padding: 10px 14px;
+  outline: none;
+  transition: border 0.2s;
+}
+input:focus, select:focus { border-color: var(--gold); }
+input::placeholder { color: #444; }
+
+#subjectsContainer { margin-top: 10px; }
+.subject-row {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+.subject-row-title {
+  font-size: 12px;
+  color: var(--gold-dim);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 10px;
+}
+.row-3 { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 10px; }
+
+.btn {
+  display: inline-block;
+  padding: 11px 22px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'Space Grotesk', sans-serif;
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.15s, transform 0.1s;
+}
+.btn:active { transform: scale(0.97); }
+.btn-gold {
+  background: var(--gold);
+  color: #0d0d0d;
+  width: 100%;
+  font-size: 15px;
+  padding: 13px;
+  margin-top: 20px;
+}
+.btn-gold:hover { opacity: 0.88; }
+
+#results { display: none; }
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.stat-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 12px;
+  text-align: center;
+}
+.stat-value {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--gold);
+  line-height: 1;
+}
+.stat-label {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th {
+  text-align: left;
+  padding: 10px 12px;
+  color: var(--muted);
+  font-weight: 500;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+td { padding: 11px 12px; border-bottom: 1px solid #1a1a1a; }
+tr:last-child td { border-bottom: none; }
+
+.grade-chip {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.remark-banner {
+  background: linear-gradient(135deg, #1a1200, #1e1600);
+  border: 1px solid var(--gold-dim);
+  border-radius: 10px;
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.remark-icon { font-size: 28px; }
+.remark-text { font-size: 15px; font-weight: 600; color: var(--gold); }
+.remark-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+.divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+#resetBtn {
+  width: 100%;
+  margin-top: 12px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  padding: 11px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  font-family: 'Space Grotesk', sans-serif;
+  transition: all 0.2s;
+}
+#resetBtn:hover { border-color: var(--red); color: var(--red); }
+
+@media (max-width: 480px) {
+  .stat-grid { grid-template-columns: repeat(2, 1fr); }
+  .row-3 { grid-template-columns: 1fr; }
+  .ref-grid { grid-template-columns: repeat(3, 1fr); }
+}
+```
+
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo-mark">G</div>
+  <div class="logo-text">Grade<span>IQ</span></div>
+</header>
+
+<div class="hero">
+  <h1>Know your <em>grades,</em><br/>own your future.</h1>
+  <p>Enter your subjects, grade points and credit hours — GradeIQ calculates your GPA and CGPA instantly.</p>
+</div>
+
+<div class="container">
+
+  <!-- GRADE POINT REFERENCE -->
+
+  <div class="ref-card">
+    <div class="ref-title">📘 Grade Point Reference (4.0 Scale)</div>
+    <div class="ref-grid">
+      <div class="ref-item"><div class="ref-grade">A+</div><div class="ref-point">4.0</div></div>
+      <div class="ref-item"><div class="ref-grade">A</div><div class="ref-point">4.0</div></div>
+      <div class="ref-item"><div class="ref-grade">A-</div><div class="ref-point">3.7</div></div>
+      <div class="ref-item"><div class="ref-grade">B+</div><div class="ref-point">3.3</div></div>
+      <div class="ref-item"><div class="ref-grade">B</div><div class="ref-point">3.0</div></div>
+      <div class="ref-item"><div class="ref-grade">B-</div><div class="ref-point">2.7</div></div>
+      <div class="ref-item"><div class="ref-grade">C+</div><div class="ref-point">2.3</div></div>
+      <div class="ref-item"><div class="ref-grade">C</div><div class="ref-point">2.0</div></div>
+      <div class="ref-item"><div class="ref-grade">C-</div><div class="ref-point">1.7</div></div>
+      <div class="ref-item"><div class="ref-grade">D</div><div class="ref-point">1.0</div></div>
+      <div class="ref-item"><div class="ref-grade">F</div><div class="ref-point">0.0</div></div>
+    </div>
+  </div>
+
+  <!-- STEP 1 -->
+
+  <div class="card" id="step1">
+    <div class="card-title">Step 1 — Your Details</div>
+    <label>Full Name</label>
+    <input type="text" id="studentName" placeholder="e.g. Pamela Asante"/>
+    <label>Student ID</label>
+    <input type="text" id="studentID" placeholder="e.g. UPS/IT/2025/001"/>
+    <label>Number of Subjects</label>
+    <input type="number" id="numSubjects" placeholder="e.g. 6" min="1" max="20"/>
+    <button class="btn btn-gold" onclick="generateSubjects()">Continue →</button>
+  </div>
+
+  <!-- STEP 2 -->
+
+  <div class="card" id="step2" style="display:none;">
+    <div class="card-title">Step 2 — Enter Your Subjects</div>
+    <p style="font-size:13px; color:var(--muted); margin-bottom:14px;">
+      Use the reference table above to find your grade point for each subject.
+    </p>
+    <div id="subjectsContainer"></div>
+    <button class="btn btn-gold" onclick="calculateGrades()">Calculate My GPA →</button>
+  </div>
+
+  <!-- RESULTS -->
+
+  <div id="results">
+
+```
+<div class="card">
+  <div class="card-title">Your Results</div>
+  <div id="studentInfo" style="margin-bottom:16px; font-size:13px; color:var(--muted);"></div>
+  <div class="stat-grid" id="statGrid"></div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Subject</th>
+          <th>Grade Point</th>
+          <th>Credit Hours</th>
+          <th>Quality Points</th>
+        </tr>
+      </thead>
+      <tbody id="resultsTable"></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="remark-banner" id="remarkBanner"></div>
+
+<!-- CGPA -->
+<div class="card" id="cgpaCard">
+  <div class="card-title">CGPA Calculator</div>
+  <p style="font-size:13px; color:var(--muted); margin-bottom:14px;">
+    Have previous semester GPAs? Enter them below to calculate your Cumulative GPA.
+  </p>
+  <label>Number of Previous Semesters</label>
+  <input type="number" id="prevSemesters" placeholder="0 if this is your first semester" min="0" max="20" value="0"/>
+  <div id="cgpaInputs"></div>
+  <button class="btn btn-gold" onclick="calculateCGPA()">Calculate CGPA →</button>
+
+  <div id="cgpaResult" style="display:none; margin-top:20px;">
+    <div class="divider"></div>
+    <div class="stat-box" style="text-align:center; padding:20px;">
+      <div class="stat-value" id="cgpaValue" style="font-size:36px;"></div>
+      <div class="stat-label">Cumulative GPA (CGPA)</div>
+    </div>
+    <div class="remark-banner" id="cgpaRemark" style="margin-top:14px; margin-bottom:0;"></div>
+  </div>
+</div>
+
+<button id="resetBtn" onclick="resetAll()">↺ Start Over</button>
+```
+
+  </div>
+
+</div>
+
+<script>
+  let currentGPA = 0;
+
+  function getLetterGrade(gp) {
+    if (gp >= 4.0) return "A";
+    if (gp >= 3.7) return "A-";
+    if (gp >= 3.3) return "B+";
+    if (gp >= 3.0) return "B";
+    if (gp >= 2.7) return "B-";
+    if (gp >= 2.3) return "C+";
+    if (gp >= 2.0) return "C";
+    if (gp >= 1.7) return "C-";
+    if (gp >= 1.0) return "D";
+    return "F";
+  }
+
+  function getRemark(gpa) {
+    if (gpa >= 3.5) return { icon: "🏆", text: "First Class Honours!", sub: "Outstanding performance. Keep it up!" };
+    if (gpa >= 3.0) return { icon: "🎉", text: "Second Class Upper!", sub: "Excellent work. You are doing great!" };
+    if (gpa >= 2.5) return { icon: "👏", text: "Second Class Lower", sub: "Good effort. Push a little harder!" };
+    if (gpa >= 2.0) return { icon: "💪", text: "Third Class", sub: "Keep working hard. You can do better!" };
+    return { icon: "📚", text: "Below Pass", sub: "Don't give up. Study harder next semester!" };
+  }
+
+  function generateSubjects() {
+    const name = document.getElementById('studentName').value.trim();
+    const id = document.getElementById('studentID').value.trim();
+    const num = parseInt(document.getElementById('numSubjects').value);
+
+    if (!name || !id || !num || num < 1) {
+      alert("Please fill in all your details first!");
+      return;
+    }
+
+    const container = document.getElementById('subjectsContainer');
+    container.innerHTML = '';
+
+    for (let i = 0; i < num; i++) {
+      container.innerHTML += `
+        <div class="subject-row">
+          <div class="subject-row-title">Subject ${i + 1}</div>
+          <div class="row-3">
+            <div>
+              <label style="margin-top:0;">Subject Name</label>
+              <input type="text" class="subName" placeholder="e.g. Mathematics"/>
+            </div>
+            <div>
+              <label style="margin-top:0;">Grade Point</label>
+              <input type="number" class="subGP" placeholder="e.g. 3.3" min="0" max="4" step="0.1"/>
+            </div>
+            <div>
+              <label style="margin-top:0;">Credit Hours</label>
+              <input type="number" class="subCredit" placeholder="e.g. 3" min="1" max="6"/>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    document.getElementById('step1').style.display = 'none';
+    document.getElementById('step2').style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function calculateGrades() {
+    const names = document.querySelectorAll('.subName');
+    const gps = document.querySelectorAll('.subGP');
+    const credits = document.querySelectorAll('.subCredit');
+
+    let totalQP = 0, totalCredits = 0;
+    let tableHTML = '';
+    let valid = true;
+
+    names.forEach((_, i) => {
+      const name = names[i].value.trim();
+      const gp = parseFloat(gps[i].value);
+      const credit = parseInt(credits[i].value);
+
+      if (!name || isNaN(gp) || isNaN(credit)) { valid = false; return; }
+
+      const qualityPoints = gp * credit;
+      totalQP += qualityPoints;
+      totalCredits += credit;
+
+      const letterGrade = getLetterGrade(gp);
+      const gpColor = gp >= 2.0 ? 'var(--gold)' : 'var(--red)';
+
+      tableHTML += `
+        <tr>
+          <td>${name}</td>
+          <td><span class="grade-chip" style="color:${gpColor}">${gp.toFixed(1)} (${letterGrade})</span></td>
+          <td>${credit}</td>
+          <td>${qualityPoints.toFixed(2)}</td>
+        </tr>`;
+    });
+
+    if (!valid) { alert("Please fill in all subject details!"); return; }
+
+    currentGPA = totalQP / totalCredits;
+    const remark = getRemark(currentGPA);
+
+    const studentName = document.getElementById('studentName').value;
+    const studentID = document.getElementById('studentID').value;
+
+    document.getElementById('studentInfo').innerHTML =
+      `<strong style="color:var(--text)">${studentName}</strong> &nbsp;|&nbsp; ID: ${studentID}`;
+
+    document.getElementById('statGrid').innerHTML = `
+      <div class="stat-box">
+        <div class="stat-value">${currentGPA.toFixed(2)}</div>
+        <div class="stat-label">GPA / 4.0</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-value">${totalCredits}</div>
+        <div class="stat-label">Total Credits</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-value">${names.length}</div>
+        <div class="stat-label">Subjects</div>
+      </div>`;
+
+    document.getElementById('resultsTable').innerHTML = tableHTML;
+
+    document.getElementById('remarkBanner').innerHTML = `
+      <div class="remark-icon">${remark.icon}</div>
+      <div>
+        <div class="remark-text">${remark.text}</div>
+        <div class="remark-sub">${remark.sub}</div>
+      </div>`;
+
+    document.getElementById('step2').style.display = 'none';
+    document.getElementById('results').style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  document.getElementById('prevSemesters').addEventListener('input', function () {
+    const n = parseInt(this.value) || 0;
+    let html = '';
+    for (let i = 1; i <= n; i++) {
+      html += `
+        <div style="margin-top:10px;">
+          <label>Semester ${i} GPA</label>
+          <input type="number" class="prevGPA" placeholder="e.g. 3.50" min="0" max="4" step="0.01"/>
+        </div>`;
+    }
+    document.getElementById('cgpaInputs').innerHTML = html;
+    document.getElementById('cgpaResult').style.display = 'none';
+  });
+
+  function calculateCGPA() {
+    const prevGPAs = document.querySelectorAll('.prevGPA');
+    let total = currentGPA;
+    let count = 1;
+
+    prevGPAs.forEach(input => {
+      const val = parseFloat(input.value);
+      if (!isNaN(val)) { total += val; count++; }
+    });
+
+    const cgpa = total / count;
+    document.getElementById('cgpaValue').textContent = cgpa.toFixed(2) + " / 4.0";
+
+    const remark = getRemark(cgpa);
+    document.getElementById('cgpaRemark').innerHTML = `
+      <div class="remark-icon">${remark.icon}</div>
+      <div>
+        <div class="remark-text">${remark.text}</div>
+        <div class="remark-sub">${remark.sub}</div>
+      </div>`;
+
+    document.getElementById('cgpaResult').style.display = 'block';
+    document.getElementById('cgpaResult').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function resetAll() {
+    document.getElementById('studentName').value = '';
+    document.getElementById('studentID').value = '';
+    document.getElementById('numSubjects').value = '';
+    document.getElementById('step1').style.display = 'block';
+    document.getElementById('step2').style.display = 'none';
+    document.getElementById('results').style.display = 'none';
+    document.getElementById('cgpaResult').style.display = 'none';
+    document.getElementById('cgpaInputs').innerHTML = '';
+    document.getElementById('prevSemesters').value = '0';
+    currentGPA = 0;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+
+  <!-- FOOTER -->
+
+  <div style="text-align:center; padding: 30px 16px 10px; color: #444; font-size: 13px;">
+    <div style="margin-bottom:6px; color: #f0c040; font-family: 'Space Grotesk', sans-serif; font-weight: 600;">GradeIQ</div>
+    <div>Designed & Developed by <strong style="color: #f0f0f0;">Pamela</strong></div>
+    <div style="margin-top:4px;">© 2025 All Rights Reserved</div>
+  </div>
+
+</body>
+</html>
